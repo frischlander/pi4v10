@@ -1,10 +1,11 @@
 services:
   - type: web
-    name: pi4-dengue-app
-    env: python
+    name: pi4v10-service
+    runtime: python
     plan: free
-    buildCommand: "pip install -r requirements.txt"
-    startCommand: "gunicorn wsgi:app"
+    region: oregon
+    buildCommand: pip install --no-cache-dir -r requirements.txt
+    startCommand: gunicorn app:app --timeout 120 --workers 2
     envVars:
       - key: PYTHON_VERSION
-        value: "3.11"
+        value: 3.11
