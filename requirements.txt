@@ -40,3 +40,5 @@ tqdm>=4.65.0
 # streamlit>=1.28.0  # Alternativa ao Flask
 # fastapi>=0.104.0  # Para API REST
 # uvicorn>=0.24.0  # ASGI server para FastAPI
+
+gunicorn
