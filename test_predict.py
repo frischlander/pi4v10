@@ -10,8 +10,8 @@ import json
 model = joblib.load("modelo_reglog_pi4_retrained.pkl")
 model_features = model.feature_names_in_
 
-IDADE_MEAN = 35.63
-IDADE_STD = 19.34
+IDADE_MEAN = 39.15432300163132
+IDADE_STD = 22.39768282493475
 CATEGORICAL_COLS = ['CS_SEXO', 'FEBRE', 'VOMITO', 'MIALGIA', 'CEFALEIA', 'EXANTEMA']
 
 def simulate_predict(idade, sexo, febre, vomito, mialgia, cefaleia, exantema):

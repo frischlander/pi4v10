@@ -1,1 +1,27 @@
-{"roc_auc": 99.3, "accuracy": 99.36, "recall_sim": 98.54, "precision_sim": 100.0, "features": ["IDADE", "CS_SEXO_F", "CS_SEXO_M", "FEBRE_IGNORADO", "FEBRE_N\u00c3O", "FEBRE_SIM", "VOMITO_IGNORADO", "VOMITO_N\u00c3O", "VOMITO_SIM", "MIALGIA_IGNORADO", "MIALGIA_N\u00c3O", "MIALGIA_SIM", "CEFALEIA_IGNORADO", "CEFALEIA_N\u00c3O", "CEFALEIA_SIM", "EXANTEMA_IGNORADO", "EXANTEMA_N\u00c3O", "EXANTEMA_SIM"]}
+{
+  "roc_auc": 99.33,
+  "accuracy": 99.2,
+  "precision_nao": 98.43,
+  "recall_nao": 100.0,
+  "precision_sim": 100.0,
+  "recall_sim": 98.41,
+  "features": [
+    "IDADE",
+    "CS_SEXO_M",
+    "FEBRE_N\u00c3O",
+    "FEBRE_SIM",
+    "VOMITO_N\u00c3O",
+    "VOMITO_SIM",
+    "MIALGIA_N\u00c3O",
+    "MIALGIA_SIM",
+    "CEFALEIA_N\u00c3O",
+    "CEFALEIA_SIM",
+    "EXANTEMA_N\u00c3O",
+    "EXANTEMA_SIM"
+  ],
+  "n_features": 12,
+  "scaling_params": {
+    "idade_mean": 39.15432300163132,
+    "idade_std": 22.39768282493475
+  }
+}
