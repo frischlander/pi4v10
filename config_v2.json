@@ -1,0 +1,35 @@
+{
+    "dataset": {
+        "registros_original": 18653,
+        "registros_treino": 14922,
+        "registros_teste": 3731,
+        "taxa_hospitalizacao": 0.014635715434514555
+    },
+    "features": {
+        "total": 21,
+        "top_5": [
+            "DIAS_SINTOMA_NOTIFIC",
+            "MES",
+            "TRIMESTRE",
+            "TEM_COMORBIDADE",
+            "NU_ANO"
+        ]
+    },
+    "hiperparametros": {
+        "C": 0.0072375685463295595,
+        "penalty": "l1",
+        "class_weight": "balanced"
+    },
+    "metricas": {
+        "accuracy": 0.7215223800589654,
+        "sensitivity": 0.4727272727272727,
+        "specificity": 0.7252448313384113,
+        "ppv": 0.025096525096525095,
+        "npv": 0.989239332096475,
+        "f1": 0.04766269477543538,
+        "auc": 0.622722326639628,
+        "fn": 29,
+        "fp": 1010
+    },
+    "data_treinamento": "2025-11-15 12:18:05"
+}

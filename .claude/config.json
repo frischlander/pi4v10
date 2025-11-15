@@ -1,0 +1,67 @@
+{
+  "project": {
+    "name": "ai-orchestrator",
+    "version": "1.0.0",
+    "description": "Sistema de orquestração multi-agent para projetos de IA"
+  },
+  "sub_agents": {
+    "data_engineer": {
+      "role": "Engenheiro de Dados",
+      "focus": ["ETL", "Pipelines", "Modelagem de Dados", "SQL"],
+      "tools": ["Spark", "Airflow", "DBT", "Snowflake"],
+      "prompt_file": "prompts/data_engineer.md"
+    },
+    "ml_engineer": {
+      "role": "Engenheiro de Machine Learning",
+      "focus": ["Modelos", "Treinamento", "Feature Engineering", "Deployment"],
+      "tools": ["PyTorch", "TensorFlow", "MLflow", "scikit-learn"],
+      "prompt_file": "prompts/ml_engineer.md"
+    },
+    "ai_architect": {
+      "role": "Arquiteto de IA",
+      "focus": ["LLMs", "RAG", "Embeddings", "Sistemas de IA"],
+      "tools": ["LangChain", "LlamaIndex", "Vector DBs", "Claude API"],
+      "prompt_file": "prompts/ai_architect.md"
+    },
+    "devops_engineer": {
+      "role": "Engenheiro DevOps",
+      "focus": ["CI/CD", "Kubernetes", "IaC", "Monitoring"],
+      "tools": ["Docker", "Terraform", "GitHub Actions", "Prometheus"],
+      "prompt_file": "prompts/devops_engineer.md"
+    },
+    "qa_analyst": {
+      "role": "Analista de QA",
+      "focus": ["Testes", "Validação", "Performance", "Quality Assurance"],
+      "tools": ["pytest", "Great Expectations", "Locust", "evidently"],
+      "prompt_file": "prompts/qa_analyst.md"
+    }
+  },
+  "templates": {
+    "data_pipeline": "tasks/data_pipeline.md",
+    "real_time_streaming": "tasks/real_time_streaming.md",
+    "ml_recommendation": "tasks/ml_recommendation.md",
+    "rag_chatbot": "tasks/rag_chatbot.md",
+    "mlops_pipeline": "tasks/mlops_pipeline.md",
+    "fraud_detection": "tasks/fraud_detection.md",
+    "k8s_microservices": "tasks/k8s_microservices.md",
+    "ab_testing": "tasks/ab_testing.md"
+  },
+  "optimization": {
+    "token_efficiency": true,
+    "parallel_execution": false,
+    "result_caching": true,
+    "cost_tracking": true
+  },
+  "best_practices": {
+    "max_context_length": 100000,
+    "prefer_incremental_tasks": true,
+    "validate_before_deploy": true,
+    "test_coverage_threshold": 0.80
+  },
+  "healthcare_ml_specialist": {
+      "role": "Especialista em ML para Saúde",
+      "focus": ["ML Médico", "Métricas Clínicas", "Interpretabilidade", "Desbalanceamento"],
+      "tools": ["scikit-learn", "SHAP", "imbalanced-learn", "SMOTE"],
+      "prompt_file": "prompts/healthcare_ml_specialist.md"
+    }
+}

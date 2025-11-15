@@ -1,0 +1,38 @@
+{
+    "model_name": "Logistic Regression",
+    "features_original": 19,
+    "features_selected": 11,
+    "selected_features": [
+        "DIAS_SINTOMA_NOTIFIC",
+        "IDADE",
+        "MES",
+        "NU_ANO",
+        "VOMITO_BIN",
+        "ANO",
+        "TEM_COMORBIDADE",
+        "COMORBIDADE_SCORE",
+        "HEPATOPAT_BIN",
+        "DIABETES_BIN",
+        "RENAL_BIN"
+    ],
+    "metrics": {
+        "model": "Logistic Regression",
+        "accuracy": 0.623062381852552,
+        "sensitivity": 0.5512820512820513,
+        "specificity": 0.624136607828089,
+        "ppv": 0.02147852147852148,
+        "npv": 0.9893552311435523,
+        "f1": 0.041346153846153845,
+        "auc": 0.6203804829092627,
+        "tn": 3253,
+        "fp": 1959,
+        "fn": 35,
+        "tp": 43
+    },
+    "selection_criteria": {
+        "importance_threshold": 0.19773378632795713,
+        "correlation_threshold": 0.02,
+        "min_criteria_met": 2
+    },
+    "training_date": "2025-11-15 11:54:33"
+}

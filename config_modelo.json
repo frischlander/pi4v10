@@ -1,0 +1,42 @@
+{
+    "modelo": "Logistic Regression (Optuna)",
+    "features_total": 23,
+    "features_selecionadas": 14,
+    "features": [
+        "DIAS_SINTOMA_NOTIFIC_TEMP",
+        "TRIMESTRE",
+        "MES",
+        "DIAS_SINTOMA_NOTIFIC",
+        "TEM_COMORBIDADE",
+        "NU_ANO",
+        "QTD_IGNORADOS",
+        "SEVERITY_SCORE",
+        "IDADE",
+        "ANO",
+        "HEPATOPAT_BIN",
+        "COMORBIDADE_SCORE",
+        "DIABETES_BIN",
+        "RENAL_BIN"
+    ],
+    "hiperparametros_otuna": {
+        "C": 0.002779665418722162,
+        "penalty": "l1",
+        "class_weight": null
+    },
+    "metricas": {
+        "model": "Logistic Regression (Optuna)",
+        "accuracy": 0.7357276869471991,
+        "sensitivity": 0.43636363636363634,
+        "specificity": 0.7402067464635473,
+        "ppv": 0.024514811031664963,
+        "npv": 0.9887354651162791,
+        "f1": 0.04642166344294004,
+        "auc": 0.6295034128004748,
+        "tn": 2721,
+        "fp": 955,
+        "fn": 31,
+        "tp": 24
+    },
+    "data_treinamento": "2025-11-15 13:39:45",
+    "random_state": 42
+}

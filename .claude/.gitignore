@@ -1,0 +1,15 @@
+# Ignorar arquivos temporários e cache
+*.pyc
+__pycache__/
+.DS_Store
+.vscode/
+
+# Manter estrutura mas ignorar outputs específicos
+examples/*.output
+examples/*.log
+
+# Não ignorar os arquivos de configuração principais
+!config.json
+!prompts/
+!tasks/
+!README.md
