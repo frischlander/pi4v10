@@ -1,7 +1,5 @@
 {
-  "versao": "gold_standard_v1",
-  "features_input": [
-    "IDADE",
+  "features": [
     "CS_SEXO",
     "FEBRE",
     "VOMITO",
@@ -9,41 +7,12 @@
     "CEFALEIA",
     "EXANTEMA"
   ],
-  "n_features": 7,
-  "target": "HOSPITALIZ",
-  "classes": [
-    "NÃO",
-    "SIM"
-  ],
-  "scaling": {
-    "idade_mean": 38.70583247121076,
-    "idade_std": 22.098300822586168,
-    "outras_features": "one-hot encoded (binary)"
-  },
-  "model": {
-    "type": "LogisticRegression (calibrated)",
-    "solver": "lbfgs",
-    "calibration": "Platt Scaling",
-    "parameters": {
-      "penalty": "l2",
-      "C": 1.0,
-      "max_iter": 1000
-    }
-  },
-  "training_data": {
-    "total_samples": 58963,
-    "train_samples": 47170,
-    "test_samples": 11793,
-    "class_distribution_train": {
-      "NÃO": 26323,
-      "SIM": 20847
-    }
-  },
-  "metrics": {
-    "roc_auc": 0.9842050792048506,
-    "accuracy": 0.9799881285508353,
-    "brier_score": 0.01862547745480075,
-    "cv_score_mean": 0.9849195000629413,
-    "cv_score_std": 0.001008872906880474
-  }
+  "n_samples": 58963,
+  "train_size": 47170,
+  "test_size": 11793,
+  "roc_auc_test": 0.9791695359428518,
+  "accuracy_test": 0.9799881285508353,
+  "brier_test": 0.01931896592580488,
+  "cv_roc_mean": 0.9774081141735091,
+  "cv_roc_std": 0.0017741682156303827
 }

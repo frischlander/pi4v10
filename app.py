@@ -16,12 +16,7 @@ app = Flask(__name__)
 
 # --- Variáveis Globais ---
 MODEL_PATH = "modelo_reglog_pi4_retrained.pkl"
-SCALER_PATH = "idade_scaler.pkl"
-INPUT_FEATURES = ['IDADE', 'CS_SEXO', 'FEBRE', 'VOMITO', 'MIALGIA', 'CEFALEIA', 'EXANTEMA']
-
-# Parâmetros de escalonamento (para referência)
-IDADE_MEAN = 38.70583247121076
-IDADE_STD = 22.098300822586168
+INPUT_FEATURES = ['CS_SEXO', 'FEBRE', 'VOMITO', 'MIALGIA', 'CEFALEIA', 'EXANTEMA']
 
 # --- Carregamento de Dados ---
 
@@ -46,14 +41,7 @@ except Exception as e:
     print(f"ERRO ao carregar o modelo: {e}")
     model = None
 
-# 3. Scaler para IDADE
-print(f"Carregando scaler de {SCALER_PATH}...")
-try:
-    scaler = joblib.load(SCALER_PATH)
-    print(f"   ✓ Scaler carregado")
-except Exception as e:
-    print(f"AVISO: Scaler não carregado, usando parâmetros manuais")
-    scaler = None
+# 3. Modelo já carregado acima; não há scaler (idade removida)
 
 # --- Rotas da Aplicação ---
 
@@ -266,21 +254,18 @@ def get_filtered_data():
 def predict():
     """
     Endpoint para predição do modelo de Regressão Logística.
-    
     Modelo: Regressão Logística com Calibração (Platt Scaling)
-    Features: 7 (IDADE, CS_SEXO, FEBRE, VOMITO, MIALGIA, CEFALEIA, EXANTEMA)
-    Codificação: Label Encoding para categorias
-    Escalonamento: StandardScaler para IDADE
+    Features: 6 (CS_SEXO, FEBRE, VOMITO, MIALGIA, CEFALEIA, EXANTEMA)
+    Codificação: Label Encoding para categorias (sem IDADE)
     """
-    if model is None or scaler is None:
-        return jsonify({"error": "Modelo ou scaler não carregado"}), 500
+    if model is None:
+        return jsonify({"error": "Modelo não carregado"}), 500
 
     try:
         data = request.json
-        
-        # 1. Criar DataFrame com os dados de entrada
+
+        # 1. Criar DataFrame com os dados de entrada (somente 6 features)
         input_data = {
-            "IDADE": [int(data.get("idade", 30))],
             "CS_SEXO": [data.get("sexo", "F").upper()],
             "FEBRE": [data.get("febre", "NÃO").upper()],
             "VOMITO": [data.get("vomito", "NÃO").upper()],
@@ -288,35 +273,31 @@ def predict():
             "CEFALEIA": [data.get("cefaleia", "NÃO").upper()],
             "EXANTEMA": [data.get("exantema", "NÃO").upper()]
         }
-        
+
         input_df = pd.DataFrame(input_data)
-        
-        # 2. Tratar IGNORADO como NÃO
-        for col in INPUT_FEATURES[1:]:  # Todas exceto IDADE
+
+        # 2. Tratar IGNORADO como NÃO para todas as features
+        for col in INPUT_FEATURES:
             input_df[col] = input_df[col].replace('IGNORADO', 'NÃO')
-        
-        # 3. Codificar variáveis categóricas usando Label Encoding
+
+        # 3. Codificar variáveis categóricas
         # CS_SEXO: F=0, M=1
         input_df['CS_SEXO'] = (input_df['CS_SEXO'] == 'M').astype(int)
-        
+
         # Sintomas: NÃO=0, SIM=1
         for col in ['FEBRE', 'VOMITO', 'MIALGIA', 'CEFALEIA', 'EXANTEMA']:
             input_df[col] = (input_df[col] == 'SIM').astype(int)
-        
-        # 4. Escalar IDADE
-        input_df['IDADE'] = scaler.transform(input_df[['IDADE']])
-        
-        # 5. Garantir ordem correta das features
+
+        # 4. Garantir ordem correta das features
         X_input = input_df[INPUT_FEATURES]
-        
-        # 6. Fazer predição
+
+        # 5. Fazer predição
         prediction_proba = model.predict_proba(X_input)
         prob_hospitalizacao = prediction_proba[0][1]  # Probabilidade da classe 1 (SIM)
-        
+
         return jsonify({"probabilidade_hospitalizacao": round(prob_hospitalizacao * 100, 2)})
-    
+
     except Exception as e:
-        # Retornar o erro para diagnóstico
         import traceback
         return jsonify({
             "error": f"Erro na predição: {str(e)}",
