@@ -1,0 +1,30 @@
+================================================================================
+FEATURE IMPORTANCE ANALYSIS
+================================================================================
+
+Features selecionadas (Top 5):
+  1. FEBRE
+  2. MIALGIA
+  3. CEFALEIA
+  4. VOMITO
+  5. EXANTEMA
+
+
+Featuras removidas:
+  - CS_SEXO
+  - CS_GESTANT
+  - IDADE
+
+
+Modelo Performance:
+  ROC-AUC (teste): 0.9774
+  Accuracy (teste): 0.9800
+  Brier Score: 0.0193
+  5-Fold CV ROC-AUC: 0.9763 ± 0.0012
+
+
+Probabilidade Distribution:
+  Min: 3.71%
+  Max: 100.00%
+  Mean: 44.31%
+  Median: 3.71%

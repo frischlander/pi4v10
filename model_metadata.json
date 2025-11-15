@@ -1,0 +1,20 @@
+{
+  "features": [
+    "FEBRE",
+    "MIALGIA",
+    "CEFALEIA",
+    "VOMITO",
+    "EXANTEMA"
+  ],
+  "n_samples": 58963,
+  "train_size": 47170,
+  "test_size": 11793,
+  "roc_auc_test": 0.9773599386032233,
+  "accuracy_test": 0.9799881285508353,
+  "brier_test": 0.01933031436310382,
+  "cv_roc_mean": 0.9763229659261734,
+  "cv_roc_std": 0.0012017489314813902,
+  "proba_min": 0.037056855440592985,
+  "proba_max": 0.9999999999999998,
+  "proba_mean": 0.44305742245009655
+}
