@@ -294,11 +294,17 @@ IDADE_STD = 19.34
 if 'IDADE' in input_aligned.columns:
     idade_nao_escalada = input_df['IDADE'].iloc[0]
     idade_escalada = (idade_nao_escalada - IDADE_MEAN) / IDADE_STD
-    input_aligned['IDADE'] = idade_escal        # 4. Fazer a predição
+    input_aligned['IDADE'] = idade_escalada
+        
+        # 4. Fazer a predição
         prediction_proba = model.predict_proba(input_aligned)[:, 1]
         
         return jsonify({"probabilidade_hospitalizacao": round(prediction_proba[0] * 100, 2)})
+    
     except Exception as e:
         # Retornar o erro para diagnóstico
-        return jsonify({"error": str(e)}), 500 __name__ == "__main__":
+        return jsonify({"error": str(e)}), 500
+
+
+if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=5000)
