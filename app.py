@@ -9,7 +9,6 @@ from flask import Flask, render_template, jsonify, request
 import pandas as pd
 import joblib
 import numpy as np
-import os
 
 app = Flask(__name__)
 
@@ -17,10 +16,6 @@ app = Flask(__name__)
 MODEL_PATH = "modelo_reglog_pi4_retrained.pkl"
 INPUT_FEATURES = ['IDADE', 'CS_SEXO', 'FEBRE', 'VOMITO', 'MIALGIA', 'CEFALEIA', 'EXANTEMA']
 CATEGORICAL_COLS = ['CS_SEXO', 'FEBRE', 'VOMITO', 'MIALGIA', 'CEFALEIA', 'EXANTEMA']
-
-# Média e Desvio Padrão do dataset de treinamento (para escalonamento de IDADE)
-IDADE_MEAN = 35.63
-IDADE_STD = 19.34
 
 # --- Carregamento de Dados ---
 
@@ -289,11 +284,17 @@ def predict():
             if col in input_aligned.columns:
                 input_aligned[col] = input_encoded[col].iloc[0]
         
-        # Escalar a feature IDADE
-        if 'IDADE' in input_aligned.columns:
-            idade_nao_escalada = input_df['IDADE'].iloc[0]
-            idade_escalada = (idade_nao_escalada - IDADE_MEAN) / IDADE_STD
-            input_aligned['IDADE'] = idade_escalada
+# --- CORREÇÃO: Escalar a feature IDADE ---
+# Média e Desvio Padrão do dataset de treinamento (df_final_predict.csv)
+# Média: 35.63, Desvio Padrão: 19.34 (Valores obtidos na fase de retreinamento)
+# O modelo de Regressão Logística é sensível à escala. O erro de 8.828% é devido à falta de escalonamento.
+IDADE_MEAN = 35.63
+IDADE_STD = 19.34
+
+if 'IDADE' in input_aligned.columns:
+    idade_nao_escalada = input_df['IDADE'].iloc[0]
+    idade_escalada = (idade_nao_escalada - IDADE_MEAN) / IDADE_STD
+    input_aligned['IDADE'] = idade_escalada
         
         # 4. Fazer a predição
         prediction_proba = model.predict_proba(input_aligned)[:, 1]
@@ -306,5 +307,4 @@ def predict():
 
 
 if __name__ == "__main__":
-    port = int(os.getenv("PORT", 5000))
-    app.run(debug=False, host="0.0.0.0", port=port)
+    app.run(debug=True, host="0.0.0.0", port=5000)
