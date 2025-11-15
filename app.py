@@ -251,9 +251,10 @@ def get_filtered_data():
 
 # --- API para Predição (usa o modelo retreinado) ---
 
-# Constantes para escalonamento de IDADE
-IDADE_MEAN = 35.63
-IDADE_STD = 19.34
+# Constantes para escalonamento de IDADE (com base no dataset de treinamento)
+# Valores obtidos do retreinamento com StandardScaler
+IDADE_MEAN = 39.15432300163132
+IDADE_STD = 22.39768282493475
 
 @app.route("/api/predict", methods=["POST"])
 def predict():
@@ -276,9 +277,9 @@ def predict():
         }
         input_df = pd.DataFrame(input_data)
         
-        # 2. Aplicar one-hot encoding APENAS nas colunas categóricas de input
-        # IMPORTANTE: usar drop_first=False para manter todas as categorias
-        input_encoded = pd.get_dummies(input_df, columns=CATEGORICAL_COLS, drop_first=False)
+        # 2. Aplicar one-hot encoding nas colunas categóricas
+        # IMPORTANTE: usar drop_first=True (consistente com treinamento do modelo)
+        input_encoded = pd.get_dummies(input_df, columns=CATEGORICAL_COLS, drop_first=True)
         
         # 3. Alinhar as colunas com as features exatas do modelo
         # Criar um DataFrame com todas as features esperadas, preenchidas com 0
@@ -289,7 +290,7 @@ def predict():
             if col in input_aligned.columns:
                 input_aligned[col] = input_encoded[col].iloc[0]
         
-        # 4. Escalar a feature IDADE
+        # 4. Escalar a feature IDADE usando StandardScaler
         if 'IDADE' in input_aligned.columns:
             idade_nao_escalada = input_df['IDADE'].iloc[0]
             idade_escalada = (idade_nao_escalada - IDADE_MEAN) / IDADE_STD
