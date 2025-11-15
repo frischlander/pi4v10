@@ -251,6 +251,10 @@ def get_filtered_data():
 
 # --- API para Predição (usa o modelo retreinado) ---
 
+# Constantes para escalonamento de IDADE
+IDADE_MEAN = 35.63
+IDADE_STD = 19.34
+
 @app.route("/api/predict", methods=["POST"])
 def predict():
     """Endpoint para predição do modelo de Regressão Logística."""
@@ -284,18 +288,13 @@ def predict():
             if col in input_aligned.columns:
                 input_aligned[col] = input_encoded[col].iloc[0]
         
-# --- CORREÇÃO: Escalar a feature IDADE ---
-# Média e Desvio Padrão do dataset de treinamento (df_final_predict.csv)
-# Média: 35.63, Desvio Padrão: 19.34 (Valores obtidos na fase de retreinamento)
-# O modelo de Regressão Logística é sensível à escala. O erro de 8.828% é devido à falta de escalonamento.
-IDADE_MEAN = 35.63
-IDADE_STD = 19.34
-
-if 'IDADE' in input_aligned.columns:
-    idade_nao_escalada = input_df['IDADE'].iloc[0]
-    idade_escalada = (idade_nao_escalada - IDADE_MEAN) / IDADE_STD
-    input_aligned['IDADE'] = idade_escalada
-        # 4. Fazer a predição
+        # 4. Escalar a feature IDADE
+        if 'IDADE' in input_aligned.columns:
+            idade_nao_escalada = input_df['IDADE'].iloc[0]
+            idade_escalada = (idade_nao_escalada - IDADE_MEAN) / IDADE_STD
+            input_aligned['IDADE'] = idade_escalada
+        
+        # 5. Fazer a predição
         prediction_proba = model.predict_proba(input_aligned)[:, 1]
         
         return jsonify({"probabilidade_hospitalizacao": round(prediction_proba[0] * 100, 2)})
@@ -306,4 +305,6 @@ if 'IDADE' in input_aligned.columns:
 
 
 if __name__ == "__main__":
-    app.run(debug=True, host="0.0.0.0", port=5000)
+    import os
+    port = int(os.getenv("PORT", 5000))
+    app.run(debug=False, host="0.0.0.0", port=port)
