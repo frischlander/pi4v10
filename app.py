@@ -3,19 +3,25 @@ Aplicação Flask principal para o Projeto Integrador IV - Dengue Sertãozinho
 
 - Usa `df_dengue_tratado.csv` para todas as estatísticas e análises gerais.
 - Usa `modelo_reglog_pi4_retrained.pkl` e o dataset balanceado `df_final_predict.csv` APENAS para o modelo preditivo.
+- PADRÃO OURO: Modelo treinado com apenas 7 features de input
 """
 
 from flask import Flask, render_template, jsonify, request
 import pandas as pd
 import joblib
 import numpy as np
+import os
 
 app = Flask(__name__)
 
 # --- Variáveis Globais ---
 MODEL_PATH = "modelo_reglog_pi4_retrained.pkl"
+SCALER_PATH = "idade_scaler.pkl"
 INPUT_FEATURES = ['IDADE', 'CS_SEXO', 'FEBRE', 'VOMITO', 'MIALGIA', 'CEFALEIA', 'EXANTEMA']
-CATEGORICAL_COLS = ['CS_SEXO', 'FEBRE', 'VOMITO', 'MIALGIA', 'CEFALEIA', 'EXANTEMA']
+
+# Parâmetros de escalonamento (para referência)
+IDADE_MEAN = 38.70583247121076
+IDADE_STD = 22.098300822586168
 
 # --- Carregamento de Dados ---
 
@@ -31,18 +37,23 @@ except FileNotFoundError:
     print("ERRO: df_dengue_tratado.csv não encontrado.")
     df_stats = pd.DataFrame()
 
-
 # 2. Modelo Preditivo
 print(f"Carregando modelo preditivo de {MODEL_PATH}...")
 try:
     model = joblib.load(MODEL_PATH)
-    model_features = model.feature_names_in_
     print(f"   ✓ Modelo carregado: {type(model).__name__}")
-    print(f"   ✓ Features do modelo: {len(model_features)}")
 except Exception as e:
     print(f"ERRO ao carregar o modelo: {e}")
     model = None
-    model_features = []
+
+# 3. Scaler para IDADE
+print(f"Carregando scaler de {SCALER_PATH}...")
+try:
+    scaler = joblib.load(SCALER_PATH)
+    print(f"   ✓ Scaler carregado")
+except Exception as e:
+    print(f"AVISO: Scaler não carregado, usando parâmetros manuais")
+    scaler = None
 
 # --- Rotas da Aplicação ---
 
@@ -251,63 +262,68 @@ def get_filtered_data():
 
 # --- API para Predição (usa o modelo retreinado) ---
 
-# Constantes para escalonamento de IDADE (com base no dataset de treinamento)
-# Valores obtidos do retreinamento com StandardScaler
-IDADE_MEAN = 39.15432300163132
-IDADE_STD = 22.39768282493475
-
 @app.route("/api/predict", methods=["POST"])
 def predict():
-    """Endpoint para predição do modelo de Regressão Logística."""
-    if model is None:
-        return jsonify({"error": "Modelo não carregado"}), 500
+    """
+    Endpoint para predição do modelo de Regressão Logística.
+    
+    Modelo: Regressão Logística com Calibração (Platt Scaling)
+    Features: 7 (IDADE, CS_SEXO, FEBRE, VOMITO, MIALGIA, CEFALEIA, EXANTEMA)
+    Codificação: Label Encoding para categorias
+    Escalonamento: StandardScaler para IDADE
+    """
+    if model is None or scaler is None:
+        return jsonify({"error": "Modelo ou scaler não carregado"}), 500
 
     try:
         data = request.json
         
-        # 1. Criar um DataFrame com os dados de entrada (apenas as 7 features)
+        # 1. Criar DataFrame com os dados de entrada
         input_data = {
             "IDADE": [int(data.get("idade", 30))],
-            "CS_SEXO": [data.get("sexo", "F")],
-            "FEBRE": [data.get("febre", "NÃO")],
-            "VOMITO": [data.get("vomito", "NÃO")],
-            "MIALGIA": [data.get("mialgia", "NÃO")],
-            "CEFALEIA": [data.get("cefaleia", "NÃO")],
-            "EXANTEMA": [data.get("exantema", "NÃO")]
+            "CS_SEXO": [data.get("sexo", "F").upper()],
+            "FEBRE": [data.get("febre", "NÃO").upper()],
+            "VOMITO": [data.get("vomito", "NÃO").upper()],
+            "MIALGIA": [data.get("mialgia", "NÃO").upper()],
+            "CEFALEIA": [data.get("cefaleia", "NÃO").upper()],
+            "EXANTEMA": [data.get("exantema", "NÃO").upper()]
         }
+        
         input_df = pd.DataFrame(input_data)
         
-        # 2. Aplicar one-hot encoding nas colunas categóricas
-        # IMPORTANTE: usar drop_first=True (consistente com treinamento do modelo)
-        input_encoded = pd.get_dummies(input_df, columns=CATEGORICAL_COLS, drop_first=True)
+        # 2. Tratar IGNORADO como NÃO
+        for col in INPUT_FEATURES[1:]:  # Todas exceto IDADE
+            input_df[col] = input_df[col].replace('IGNORADO', 'NÃO')
         
-        # 3. Alinhar as colunas com as features exatas do modelo
-        # Criar um DataFrame com todas as features esperadas, preenchidas com 0
-        input_aligned = pd.DataFrame(0.0, index=[0], columns=model_features)
+        # 3. Codificar variáveis categóricas usando Label Encoding
+        # CS_SEXO: F=0, M=1
+        input_df['CS_SEXO'] = (input_df['CS_SEXO'] == 'M').astype(int)
         
-        # Preencher as colunas que vieram do input_encoded
-        for col in input_encoded.columns:
-            if col in input_aligned.columns:
-                input_aligned[col] = input_encoded[col].iloc[0]
+        # Sintomas: NÃO=0, SIM=1
+        for col in ['FEBRE', 'VOMITO', 'MIALGIA', 'CEFALEIA', 'EXANTEMA']:
+            input_df[col] = (input_df[col] == 'SIM').astype(int)
         
-        # 4. Escalar a feature IDADE usando StandardScaler
-        if 'IDADE' in input_aligned.columns:
-            idade_nao_escalada = input_df['IDADE'].iloc[0]
-            idade_escalada = (idade_nao_escalada - IDADE_MEAN) / IDADE_STD
-            input_aligned['IDADE'] = idade_escalada
+        # 4. Escalar IDADE
+        input_df['IDADE'] = scaler.transform(input_df[['IDADE']])
         
-        # 5. Fazer a predição
-        prediction_proba = model.predict_proba(input_aligned)
+        # 5. Garantir ordem correta das features
+        X_input = input_df[INPUT_FEATURES]
+        
+        # 6. Fazer predição
+        prediction_proba = model.predict_proba(X_input)
         prob_hospitalizacao = prediction_proba[0][1]  # Probabilidade da classe 1 (SIM)
         
         return jsonify({"probabilidade_hospitalizacao": round(prob_hospitalizacao * 100, 2)})
     
     except Exception as e:
         # Retornar o erro para diagnóstico
-        return jsonify({"error": f"Erro na predição: {str(e)}"}), 500
+        import traceback
+        return jsonify({
+            "error": f"Erro na predição: {str(e)}",
+            "traceback": traceback.format_exc()
+        }), 500
 
 
 if __name__ == "__main__":
-    import os
     port = int(os.getenv("PORT", 5000))
     app.run(debug=False, host="0.0.0.0", port=port)
